@@ -45,6 +45,7 @@ class MyForm(QDialog):
         self.ui.pushButton_Camera.clicked.connect(self.select_camear)
         self.ui.pushButton_BegDet.clicked.connect(self.begin_detect)
         self.ui.pushButton_Exit.clicked.connect(self._exit)
+        self.ui.pushButton_SavePath.clicked.connect(self.select_savepath)
         self.show()
 
     def read_and_show_image_from_path(self, image_path):
@@ -141,6 +142,7 @@ class MyForm(QDialog):
             flag, image = cap.read()
             self.show_image_from_array(image, ori=True)
             self.now = cap
+            self.print_id = 1
     
     def begin_detect(self):
         if self.model is None:
@@ -164,7 +166,7 @@ class MyForm(QDialog):
             self._timer.start(20)
         else:
             image_det = self.model(self.now)
-            cv2.imwrite(os.path.join(self.save_path, f'{self.save_id}.jpg'), image_det)
+            cv2.imencode(".jpg", image_det)[1].tofile(os.path.join(self.save_path, f'{self.save_id}.jpg'))
             self.ui.textBrowser.append(f'save image in {os.path.join(self.save_path, f"{self.save_id}.jpg")}')
             self.save_id += 1
             self.show_image_from_array(image_det, det=True)
@@ -188,7 +190,7 @@ class MyForm(QDialog):
             img_path = self.now[0]
             image = self.read_and_show_image_from_path(img_path)
             image_det = self.model(image)
-            cv2.imwrite(os.path.join(self.save_path, f'{self.save_id}.jpg'), image_det)
+            cv2.imencode(".jpg", image_det)[1].tofile(os.path.join(self.save_path, f'{self.save_id}.jpg'))
             self.ui.textBrowser.append(f'{self.print_id}/{self.folder_len} save image in {os.path.join(self.save_path, f"{self.save_id}.jpg")}')
             self.show_image_from_array(image_det, det=True)
             self.print_id += 1
