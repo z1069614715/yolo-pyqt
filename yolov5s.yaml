@@ -1,0 +1,7 @@
+model_path: weight/yolov5s.pt
+iou_thres: 0.65
+conf_thres: 0.5
+device: 0 # (0 for cuda:0) or (-1 for cpu)
+names: ['pedestrian', 'people', 'bicycle', 'car', 'van', 'truck', 'tricycle', 'awning-tricycle', 'bus', 'motor']
+imgsz: [960, 960]
+model_type: yolov5

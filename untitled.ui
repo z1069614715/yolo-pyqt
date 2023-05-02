@@ -41,7 +41,7 @@
     </font>
    </property>
    <property name="text">
-    <string>选择模型</string>
+    <string>选择配置文件</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_Exit">
@@ -236,6 +236,31 @@
    <property name="text">
     <string>设置保存路径</string>
    </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox">
+   <property name="geometry">
+    <rect>
+     <x>1460</x>
+     <y>140</y>
+     <width>151</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>15</pointsize>
+    </font>
+   </property>
+   <item>
+    <property name="text">
+     <string>NoTrack</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>ByteTrack</string>
+    </property>
+   </item>
   </widget>
  </widget>
  <resources/>
