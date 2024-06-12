@@ -1,10 +1,15 @@
-# YoloV7-Pyqt5
+# Yolo-Pyqt5
 
-yolov7 with pyqt implement in pytorch.  
-2023.4.18 support yolov5!!!
+yolo with pyqt implement in pytorch.  
+2023.4.18 support yolov5!!!  
+2024.6.12 support yolov8、rtdetr!!!
 
+#### yolov5、yolov7使用教学
 视频教学地址: https://www.bilibili.com/video/BV1BP4y1X7ae/?vd_source=c8452371e7ca510979593165c8d7ac27  
 博客地址: https://blog.csdn.net/qq_37706472
+
+#### yolov8、rtdetr使用教学
+视频教学地址: 
 
 ### untitled.ui -> pyqt5 ui文件  
 ### gui.py -> 由untitled.ui转换出来的py文件
@@ -37,8 +42,12 @@ yolov7 with pyqt implement in pytorch.
 7. 增加目标跟踪功能,目前支持bytetrack跟踪器.
 8. 增加推理时间显示,增加视频检测中的fps显示.
 
+### 2024.6.12
+1. 支持yolov8、rtdetr.
+
 # 参考
 https://github.com/ultralytics/yolov5  
 https://github.com/WongKinYiu/yolov7  
 https://github.com/samson-wang/cython_bbox  
 https://github.com/ifzhang/ByteTrack  
+https://github.com/ultralytics/ultralytics  

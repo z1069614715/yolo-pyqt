@@ -5,6 +5,7 @@ import cv2
 import torch
 import numpy as np
 from yolo_utils.utils import non_max_suppression, letterbox, scale_coords, plot_one_box
+from ultralytics import YOLO, RTDETR
 
 def ByteTrack_opt():
     parser = argparse.ArgumentParser("ByteTrack Param.")
@@ -140,6 +141,50 @@ class yolov5(base_model):
                 plot_one_box(xyxy, img, label=label, color=self.colors[int(cls)])
         
         return img, result
+
+class yolov8:
+    def __init__(self, model_path, iou_thres, conf_thres, device, names, imgsz, **kwargs) -> None:
+        device = self.select_device(device)
+        print(device)
+        model = YOLO(model_path)
+        colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
+        self.__dict__.update(locals())
+    
+    def __call__(self, data):
+        if type(data) is str:
+            image = cv2.imdecode(np.fromfile(data, np.uint8), cv2.IMREAD_COLOR)
+        else:
+            image = data
+        
+        result = next(self.model.predict(source=image, stream=True, iou=self.iou_thres, conf=self.conf_thres, save=False))
+        result = result.boxes.data.cpu().detach().numpy()
+        for *xyxy, conf, cls in result:
+            label = f'{self.names[int(cls)]} {conf:.2f}'
+            plot_one_box(xyxy, image, label=label, color=self.colors[int(cls)])
+        
+        return image, result
+
+class rtdetr:
+    def __init__(self, model_path, iou_thres, conf_thres, device, names, imgsz, **kwargs) -> None:
+        device = self.select_device(device)
+        print(device)
+        model = RTDETR(model_path)
+        colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
+        self.__dict__.update(locals())
+    
+    def __call__(self, data):
+        if type(data) is str:
+            image = cv2.imdecode(np.fromfile(data, np.uint8), cv2.IMREAD_COLOR)
+        else:
+            image = data
+        
+        result = next(self.model.predict(source=image, stream=True, iou=self.iou_thres, conf=self.conf_thres, save=False))
+        result = result.boxes.data.cpu().detach().numpy()
+        for *xyxy, conf, cls in result:
+            label = f'{self.names[int(cls)]} {conf:.2f}'
+            plot_one_box(xyxy, image, label=label, color=self.colors[int(cls)])
+        
+        return image, result
 
 def test_yolov7():
     # read cfg

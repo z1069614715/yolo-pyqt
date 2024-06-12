@@ -1,4 +1,6 @@
 # pyuic5 -o gui.py untitled.ui
+import warnings
+warnings.filterwarnings('ignore')
 import cv2, sys, yaml, os, torch, time
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -6,7 +8,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from gui import Ui_Dialog
 from PIL import Image
-from yolo import yolov5, yolov7
+from yolo import yolov5, yolov7, yolov8, rtdetr
 
 def resize_img(img, img_size=600, value=[255, 255, 255], inter=cv2.INTER_AREA):
     old_shape = img.shape[:2]
@@ -105,6 +107,10 @@ class MyForm(QDialog):
                 self.model = yolov5(**cfg)
             elif cfg['model_type'] == 'yolov7':
                 self.model = yolov7(**cfg)
+            elif cfg['model_type'] == 'yolov8':
+                self.model = yolov8(**cfg)
+            elif cfg['model_type'] == 'rtdetr':
+                self.model = rtdetr(**cfg)
             self.ui.textBrowser.append(f'load yaml success.')
         else:
             self.ui.textBrowser.append(f'load yaml failure.')
