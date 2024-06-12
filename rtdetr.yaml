@@ -1,5 +1,5 @@
 model_path: weight/rtdetr-l.pt # https://github.com/ultralytics/assets/releases/download/v8.2.0/rtdetr-l.pt
-iou_thres: -1
+iou_thres: 0.0
 conf_thres: 0.5
 device: 0 # (0 for cuda:0) or (-1 for cpu)
 names: [

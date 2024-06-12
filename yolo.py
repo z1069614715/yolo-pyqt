@@ -144,9 +144,9 @@ class yolov5(base_model):
 
 class yolov8:
     def __init__(self, model_path, iou_thres, conf_thres, device, names, imgsz, **kwargs) -> None:
-        device = self.select_device(device)
-        print(device)
+        print(model_path)
         model = YOLO(model_path)
+        model.info()
         colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
         self.__dict__.update(locals())
     
@@ -156,19 +156,37 @@ class yolov8:
         else:
             image = data
         
-        result = next(self.model.predict(source=image, stream=True, iou=self.iou_thres, conf=self.conf_thres, save=False))
+        result = next(self.model.predict(source=image, stream=True, iou=self.iou_thres, conf=self.conf_thres, imgsz=self.imgsz, save=False, device=self.device))
         result = result.boxes.data.cpu().detach().numpy()
         for *xyxy, conf, cls in result:
             label = f'{self.names[int(cls)]} {conf:.2f}'
             plot_one_box(xyxy, image, label=label, color=self.colors[int(cls)])
         
         return image, result
+    
+    def track_init(self, track_type):
+        from track_utils.byte_tracker import BYTETracker, BaseTrack
+        if track_type == 'ByteTrack':
+            self.track_opt = ByteTrack_opt()
+            self.tracker = BYTETracker(self.track_opt, frame_rate=self.track_opt.fps)
+            BaseTrack._count = 0
+    
+    def track_processing(self, frame, det_result):
+        if type(det_result) is torch.Tensor:
+            det_result = det_result.cpu().detach().numpy()
+        online_targets = self.tracker.update(det_result[:, :5], frame.shape[:2], [640, 640])
+        for t in online_targets:
+            tlwh = t.tlwh
+            tid = t.track_id
+            vertical = tlwh[2] / tlwh[3] > self.track_opt.aspect_ratio_thresh
+            if tlwh[2] * tlwh[3] > self.track_opt.min_box_area and not vertical:
+                plot_one_box([tlwh[0], tlwh[1], tlwh[0] + tlwh[2], tlwh[1] + tlwh[3]], frame, (0, 0, 255), str(tid))
+        return frame
 
 class rtdetr:
     def __init__(self, model_path, iou_thres, conf_thres, device, names, imgsz, **kwargs) -> None:
-        device = self.select_device(device)
-        print(device)
         model = RTDETR(model_path)
+        model.info()
         colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
         self.__dict__.update(locals())
     
@@ -178,13 +196,32 @@ class rtdetr:
         else:
             image = data
         
-        result = next(self.model.predict(source=image, stream=True, iou=self.iou_thres, conf=self.conf_thres, save=False))
+        result = next(self.model.predict(source=image, stream=True, iou=self.iou_thres, conf=self.conf_thres, imgsz=self.imgsz, save=False, device=self.device))
         result = result.boxes.data.cpu().detach().numpy()
         for *xyxy, conf, cls in result:
             label = f'{self.names[int(cls)]} {conf:.2f}'
             plot_one_box(xyxy, image, label=label, color=self.colors[int(cls)])
         
         return image, result
+    
+    def track_init(self, track_type):
+        from track_utils.byte_tracker import BYTETracker, BaseTrack
+        if track_type == 'ByteTrack':
+            self.track_opt = ByteTrack_opt()
+            self.tracker = BYTETracker(self.track_opt, frame_rate=self.track_opt.fps)
+            BaseTrack._count = 0
+    
+    def track_processing(self, frame, det_result):
+        if type(det_result) is torch.Tensor:
+            det_result = det_result.cpu().detach().numpy()
+        online_targets = self.tracker.update(det_result[:, :5], frame.shape[:2], [640, 640])
+        for t in online_targets:
+            tlwh = t.tlwh
+            tid = t.track_id
+            vertical = tlwh[2] / tlwh[3] > self.track_opt.aspect_ratio_thresh
+            if tlwh[2] * tlwh[3] > self.track_opt.min_box_area and not vertical:
+                plot_one_box([tlwh[0], tlwh[1], tlwh[0] + tlwh[2], tlwh[1] + tlwh[3]], frame, (0, 0, 255), str(tid))
+        return frame
 
 def test_yolov7():
     # read cfg
